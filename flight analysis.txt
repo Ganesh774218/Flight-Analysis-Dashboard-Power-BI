@@ -1,0 +1,155 @@
+Total flights = COUNTROWS(Sheet1)
+
+Total Flights Display = FORMAT(COUNTROWS('Sheet1'), "#,0")
+
+Total Price
+
+avg ticket price
+
+max ticket price
+
+min price ticket
+
+Total delayed time = Sheet1[Minutes to hour]-Sheet1[Max flight time]-Sheet1[Total waiting time(in hrs)]
+
+Countcategory = CALCULATE(COUNTROWS(Sheet1),Sheet1[New Flight Status] = "Late")
+
+NewCountcategory = CALCULATE(COUNTROWS(Sheet1),Sheet1[New Flight Status] = "On Time")
+
+Total delayed time = Sheet1[Minutes to hour]-Sheet1[Max flight time]-Sheet1[Total waiting time(in hrs)]
+
+max travel time
+
+minimum waiting time
+ 
+minimum travel time
+
+which flight is late in card 47 hours 
+which flight is having maximum ticket price 
+which flight has lowest ticket price
+which flight has maximum travel time
+how many flights are there in busiest route
+how many stops flight took on busiest route, how many flights are late and on time on busiest route
+
+
+
+= let
+    input = [Duration],
+    hours = if Text.Contains(input, "h") then Number.FromText(Text.BeforeDelimiter(input, "h")) else 0,
+    minutes = if Text.Contains(input, "m") then 
+        let
+            afterH = if Text.Contains(input, "h") then Text.AfterDelimiter(input, "h") else input
+        in
+            Number.FromText(Text.BeforeDelimiter(afterH, "m"))
+    else 0,
+    totalMinutes = hours * 60 + minutes
+in
+    totalMinutes
+
+
+
+Total FLight in time (in air) = FORMAT(Sheet1[Total Time (hrs)]-[Total Halt Time (hrs)]-[Total Delayed Time (hrs)],"#,0")
+Avg Flight Time (in air, hrs) = 
+FORMAT(
+    (AVERAGE(Sheet1[Total Time (hrs)]) 
+     - AVERAGE(Sheet1[Total Halt Time (hrs)]) 
+     - AVERAGE(Sheet1[Total Delayed Time (hrs)])),
+ 
+   "#,0"
+)
+
+This measure works globally — it calculates the busiest route across the entire dataset, ignoring filters unless you explicitly pass them
+
+
+
+
+
+Busiest Route (Overall) = 
+VAR RouteCounts =
+    ADDCOLUMNS (
+        SUMMARIZE ( ALL(Sheet1), Sheet1[Routes new] ),
+        "FlightCount", COUNTROWS ( Sheet1 )
+    )
+VAR MaxRoute =
+    TOPN ( 1, RouteCounts, [FlightCount], DESC )
+RETURN
+    MAXX ( MaxRoute, Sheet1[Routes new] )
+
+Answer MAA-CCU
+
+
+🧠 This ignores filters and gives the busiest route across the entire dataset
+
+
+
+
+Step 2: DAX Measure for Filtered Busiest Route
+Busiest Route (Filtered) =
+VAR RouteCounts =
+    ADDCOLUMNS (
+        SUMMARIZE ( Sheet1, Sheet1[Routes new] ),
+        "FlightCount", COUNTROWS ( Sheet1 )
+    )
+VAR MaxRoute =
+    TOPN ( 1, RouteCounts, [FlightCount], DESC )
+RETURN
+    MAXX ( MaxRoute, Sheet1[Routes new] )
+
+Answer MAA -CCu
+
+
+
+
+
+DAX Measure for Flight Count in Filtered Busiest Route
+Flight Count in Filtered Busiest Route =
+VAR BusiestRoute =
+    [Busiest Route (Filtered)]
+RETURN
+    CALCULATE (
+        COUNTROWS ( Sheet1 ),
+        Sheet1[Routes new] = BusiestRoute
+    )
+
+answer - 381
+
+
+
+
+DAX Measure for Stops in Filtered Busiest Route
+Stops in Filtered Busiest Route =
+VAR BusiestRoute =
+    [Busiest Route (Filtered)]
+RETURN
+    CALCULATE (
+        MAX ( Sheet1[Total Routes] ) - 1,
+        Sheet1[Routes new] = BusiestRoute
+    )
+
+
+
+DAX Measure for Stops in Filtered Busiest Route
+Stops in Filtered Busiest Route =
+VAR BusiestRoute =
+    [Busiest Route (Filtered)]
+RETURN
+    CALCULATE (
+        MAX ( Sheet1[Total Routes] ) - 1,
+        Sheet1[Routes new] = BusiestRoute
+    )
+
+answer - 0
+
+
+
+
+ DAX Measure for Late & On-Time Flights in Filtered Busiest Route
+Late Flights in Busiest Route =
+VAR BusiestRoute = [Busiest Route (Filtered)]
+RETURN
+    CALCULATE (
+        COUNTROWS ( Sheet1 ),
+        Sheet1[Routes new] = BusiestRoute,
+        Sheet1[Delay Flag] = "Late"
+    )
+

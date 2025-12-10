@@ -1,10 +1,8 @@
 # Flight-Analysis-Dashboard-Power-BI
-✅ Professional GitHub README
 ✈️ Flight Delay Analysis Dashboard (Power BI)
 📌 Project Overview
 
 This project analyzes flight delay patterns using cleaned airline data and interactive Power BI dashboards. The goal is to identify why flights are delayed, which airlines and routes are most affected, and how factors like seasonality, stops, and halt time contribute to delays.
-
 The analysis focuses on April–June delays, especially in southern routes, where heavy monsoon weather significantly impacts airline operations.
 
 
